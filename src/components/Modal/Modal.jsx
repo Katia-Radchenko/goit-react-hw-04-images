@@ -1,6 +1,6 @@
-import React, {Component} from "react";
-import { createPortal } from "react-dom";
-import { Backdrop, ModalWindow } from "./Modal.styled";
+import React, { Component } from 'react';
+import { createPortal } from 'react-dom';
+import { Backdrop, ModalWindow } from './Modal.styled';
 
 const modalRoot = document.querySelector('#modal-root');
 
@@ -17,13 +17,13 @@ class Modal extends Component {
     if (e.code === 'Escape') {
       this.props.closeModal();
     }
-  }
+  };
 
   clickOnBackdropHandler = e => {
     if (e.target === e.currentTarget) {
       this.props.closeModal();
     }
-  }
+  };
 
 
   render() {
@@ -31,7 +31,7 @@ class Modal extends Component {
       <Backdrop onClick={this.clickOnBackdropHandler}>
         <ModalWindow src={this.props.url}></ModalWindow>
       </Backdrop>
-      , modalRoot)
+      , modalRoot);
   }
 }
 

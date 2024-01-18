@@ -1,10 +1,7 @@
-import {Component} from 'react';
-import toast from "react-hot-toast";
-
-// import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
-
-import { MdOutlineImageSearch } from "react-icons/md";
- import IconButton from '../IconButton/IconButton';
+import { Component } from 'react';
+import toast from 'react-hot-toast';
+import { MdOutlineImageSearch } from 'react-icons/md';
+import IconButton from '../IconButton/IconButton';
 import { Form, Header, Input } from './Searchbar.styled';
 
 class Searchbar extends Component {
@@ -25,8 +22,8 @@ class Searchbar extends Component {
       this.props.onSubmit(query);
     } else {
       toast.error('Enter a valid search query!', {
-        duration: 2000
-      })
+        duration: 2000,
+      });
     }
 
     this.reset();
@@ -37,7 +34,7 @@ class Searchbar extends Component {
   };
 
   render() {
-    return(
+    return (
       <Header>
         <Form onSubmit={this.submitFormHandler}>
           <Input
@@ -52,8 +49,8 @@ class Searchbar extends Component {
           </IconButton>
         </Form>
       </Header>
-    )
+    );
   }
 }
 
-export default Searchbar
+export default Searchbar;

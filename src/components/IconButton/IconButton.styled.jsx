@@ -2,8 +2,6 @@ import styled from '@emotion/styled';
 export const Button = styled.button`
   position: absolute;
   top: 36px;
-  //left: 103px;
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -14,6 +12,7 @@ export const Button = styled.button`
   border: none;
   cursor: pointer;
   transform: translateY(-50%);
+
   svg {
     width: 16px;
     height: 16px;
