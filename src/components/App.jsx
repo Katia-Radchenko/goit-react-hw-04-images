@@ -1,47 +1,95 @@
-import React, { Component } from "react";
-import { Toaster } from "react-hot-toast";
-import Searchbar from "./Searchbar/Searchbar";
-import ImageGallery from './ImageGallery/ImageGallery';
+import React, { Component } from 'react';
+import { imgApi } from '../services/api-services';
+import Searchbar from './Searchbar/Searchbar';
+import { ImageGallery } from './ImageGallery/ImageGallery';
 import Modal from './Modal/Modal';
+import Infobox from './Infobox/Infobox';
+// import Loader from './Loader/Loader';
+import Button from './Button/Button';
+import { Loader } from './Loader/Loader';
 
-
-class App extends Component {
+export class App extends Component {
   state = {
-    searchQuery: "",
-    activeImgUrl: "",
+    textQuery: '',
+    images: [],
+    page: 1,
+    loading: false,
     showModal: false,
+    error: null,
+    totalPage: null,
   };
 
-  searchFormSubmitHandler = (query) => {
-    this.setState({ searchQuery: query });
+  async componentDidUpdate(_, prevState) {
+    let { page } = this.state;
+    const prevSearchValue = prevState.textQuery;
+    const nextSearchValue = this.state.textQuery;
+
+    if (prevSearchValue !== nextSearchValue || prevState.page !== page) {
+      this.setState({ loading: true });
+
+      try {
+        const response = await imgApi(nextSearchValue, page);
+        const { hits, totalHits } = response.data;
+        this.setState(prevState => ({
+          images: [...prevState.images, ...hits],
+          totalPage: totalHits,
+        }));
+      } catch (error) {
+        this.setState({ error: 'Something wrong. Please try again.' });
+      } finally {
+        this.setState({ loading: false });
+      }
+    }
+  }
+
+  handleSubmit = searchValue => {
+    this.setState({
+      textQuery: searchValue,
+      page: 1,
+      images: [],
+      loading: false,
+      showModal: false,
+      error: null,
+      totalPage: null,
+    });
   };
 
-  activeImgUrlHandler = (url) => {
-    this.setState({ activeImgUrl: url });
+  onLoadMore = () => {
+    this.setState(prevState => ({ page: prevState.page + 1 }));
   };
 
-  toggleModal = () => {
-    this.setState(({ showModal }) => ({ showModal: !showModal }));
+  onOpenModal = (imgUrl, tag) => {
+    this.setState({ showModal: true, imgUrl, tag });
+  };
+
+  onCloseModal = () => {
+    this.setState({ showModal: false });
   };
 
   render() {
-    const { searchQuery, activeImgUrl, showModal } = this.state;
+    const { images, showModal, imgUrl, tag, loading, totalPage, error, page } =
+      this.state;
+    const showLoadMore = totalPage / 12 > page;
+    const info = totalPage === 0;
 
     return (
       <>
-        <Searchbar onSubmit={this.searchFormSubmitHandler} />
-        <ImageGallery
-          searchQuery={searchQuery}
-          activeImgUrlHandler={this.activeImgUrlHandler}
-          onImgClick={this.toggleModal}
-        />
+        <Searchbar onSubmit={this.handleSubmit} />
+        <ImageGallery images={images} openModal={this.onOpenModal} />
+
         {showModal && (
-          <Modal closeModal={this.toggleModal} url={activeImgUrl} />
+          <Modal onClose={this.onCloseModal}>
+            <img src={imgUrl} alt={tag} />
+          </Modal>
         )}
-        <Toaster />
+
+        {loading && <Loader />}
+
+        {showLoadMore && <Button loadMore={this.onLoadMore} />}
+
+        {info && <Infobox />}
+        {error && <Infobox>{error}</Infobox>}
       </>
     );
   }
 }
-
-export default App

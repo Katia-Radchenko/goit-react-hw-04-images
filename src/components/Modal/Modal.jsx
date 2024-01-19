@@ -15,21 +15,24 @@ class Modal extends Component {
 
   clickOnEscKeyHandler = e => {
     if (e.code === 'Escape') {
-      this.props.closeModal();
+      this.props.onClose();
+      ;
     }
   };
 
   clickOnBackdropHandler = e => {
     if (e.target === e.currentTarget) {
-      this.props.closeModal();
+      this.props.onClose();
+      ;
     }
   };
 
 
   render() {
+    const { children } = this.props;
     return createPortal(
       <Backdrop onClick={this.clickOnBackdropHandler}>
-        <ModalWindow src={this.props.url}></ModalWindow>
+        <ModalWindow>{children}</ModalWindow>
       </Backdrop>
       , modalRoot);
   }

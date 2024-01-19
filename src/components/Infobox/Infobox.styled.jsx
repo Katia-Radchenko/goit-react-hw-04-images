@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 
-export const Info = styled.div`
+export const Info = styled.p`
   list-style: none;
   text-align: center;
   margin: 15px;

@@ -2,9 +2,9 @@ import React from 'react';
 
 import { LoadMoreButton } from './Button.styled';
 
-const Button = ({ onClick }) => {
+const Button = ({ loadMore }) => {
   return (
-    <LoadMoreButton type="submit" onClick={onClick}>Load more</LoadMoreButton>
+    <LoadMoreButton type="submit" onClick={loadMore}>Load more</LoadMoreButton>
   );
 };
 

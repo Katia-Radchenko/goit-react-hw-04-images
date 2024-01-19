@@ -1,21 +1,19 @@
-import React from 'react';
-
-
 import { Item, Image } from './ImageGalleryItem.styled';
 
-const ImageGalleryItem = ({ url, largeImgUrl, query, id, onClick }) => {
+
+const ImageGalleryItem = ({ item, openModal }) => {
+  const { largeImageURL, tags, webformatURL } = item;
   return (
-
-    <Item>
-      <Image
-        src={url}
-        alt={query}
-        id={id}
-        onClick={() => onClick(largeImgUrl)}
-      />
+    <Item
+      onClick={e => {
+        e.preventDefault();
+        openModal(largeImageURL, tags);
+      }}
+    >
+      <Image src={webformatURL} alt={tags} loading="lazy" />
     </Item>
-
   );
 };
+
 
 export default ImageGalleryItem;
