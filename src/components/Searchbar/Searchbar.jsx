@@ -1,56 +1,56 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { MdOutlineImageSearch } from 'react-icons/md';
 import IconButton from '../IconButton/IconButton';
 import { Form, Header, Input } from './Searchbar.styled';
 
-class Searchbar extends Component {
-  state = {
-    searchQuery: '',
+const Searchbar = ({ onSubmit }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+
+  const searchQueryHandler = ({ currentTarget: { value } }) => {
+    setSearchQuery(value.toLowerCase());
+
   };
 
-  searchQueryHandler = e => {
-    this.setState({ searchQuery: e.target.value });
-  };
-
-  submitFormHandler = e => {
+  const submitFormHandler = e => {
     e.preventDefault();
 
-    const query = this.state.searchQuery.trim();
+    const query = searchQuery.trim();
 
     if (query !== '') {
-      this.props.onSubmit(query);
+      onSubmit(query);
     } else {
       toast.error('Enter a valid search query!', {
         duration: 2000,
       });
     }
+    reset();
 
-    this.reset();
   };
 
-  reset = () => {
-    this.setState({ searchQuery: '' });
+  const reset = () => {
+    setSearchQuery('');
   };
 
-  render() {
-    return (
-      <Header>
-        <Form onSubmit={this.submitFormHandler}>
-          <Input
-            onChange={this.searchQueryHandler}
-            value={this.state.searchQuery}
-            placeholder="Search images and photos"
-            type="text"
-            autocomplete="off"
-          ></Input>
-          <IconButton>
-            <MdOutlineImageSearch />
-          </IconButton>
-        </Form>
-      </Header>
-    );
-  }
-}
+
+  return (
+    <Header>
+      <Form onSubmit={submitFormHandler}>
+        <Input
+          onChange={searchQueryHandler}
+          value={searchQuery}
+          placeholder="Search images and photos"
+          type="text"
+          autocomplete="off"
+        ></Input>
+        <IconButton>
+          <MdOutlineImageSearch />
+        </IconButton>
+      </Form>
+    </Header>
+  );
+};
+
 
 export default Searchbar;

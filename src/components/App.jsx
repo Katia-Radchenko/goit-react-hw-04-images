@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { imgApi } from '../services/api-services';
 import Searchbar from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
@@ -7,88 +7,86 @@ import Infobox from './Infobox/Infobox';
 import Button from './Button/Button';
 import { Loader } from './Loader/Loader';
 
-export class App extends Component {
-  state = {
-    textQuery: '',
-    images: [],
-    page: 1,
-    loading: false,
-    showModal: false,
-    error: null,
-    totalPage: null,
-  };
+const App = () => {
+  const [textQuery, setTextQuery] = useState('');
+  const [images, setImages] = useState([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [error, setError] = useState(null);
+  const [totalPage, setTotalPage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
 
-  async componentDidUpdate(_, prevState) {
-    let { page } = this.state;
-    const prevSearchValue = prevState.textQuery;
-    const nextSearchValue = this.state.textQuery;
 
-    if (prevSearchValue !== nextSearchValue || prevState.page !== page) {
-      this.setState({ loading: true });
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setLoading(true);
 
       try {
-        const response = await imgApi(nextSearchValue, page);
+
+        const response = await imgApi(textQuery, page);
         const { hits, totalHits } = response.data;
-        this.setState(prevState => ({
-          images: [...prevState.images, ...hits],
-          totalPage: totalHits,
-        }));
+        setImages(
+          prevImages => [...prevImages, ...hits],
+          setTotalPage(totalHits),
+        );
       } catch (error) {
-        this.setState({ error: 'Something wrong. Please try again.' });
+        setError({ error: 'Something wrong. Please try again.' });
       } finally {
-        this.setState({ loading: false });
+        setLoading(false);
       }
+    };
+    if (textQuery) {
+      fetchPosts();
     }
-  }
+  }, [page, textQuery]);
 
-  handleSubmit = searchValue => {
-    this.setState({
-      textQuery: searchValue,
-      page: 1,
-      images: [],
-      loading: false,
-      showModal: false,
-      error: null,
-      totalPage: null,
-    });
+  const handleSubmit = searchValue => {
+    if (textQuery === searchValue) {
+      return;
+    }
+    setTextQuery(searchValue);
+    setPage(1);
+    setImages([]);
+    setLoading(false);
+    setShowModal(false);
+    setError(null);
+    setTotalPage(null);
+  };
+  const onLoadMore = () => {
+    setPage(prevPage => prevPage + 1);
   };
 
-  onLoadMore = () => {
-    this.setState(prevState => ({ page: prevState.page + 1 }));
+  const onOpenModal = images => {
+    setShowModal(true);
+    setSelectedImage(images);
   };
 
-  onOpenModal = (imgUrl, tag) => {
-    this.setState({ showModal: true, imgUrl, tag });
+  const onCloseModal = () => {
+    setShowModal(false);
   };
 
-  onCloseModal = () => {
-    this.setState({ showModal: false });
-  };
+  const showLoadMore = totalPage / 12 > page;
+  const info = totalPage === 0;
+  return (
+    <>
+      <Searchbar onSubmit={handleSubmit} />
+      <ImageGallery images={images} openModal={onOpenModal} />
 
-  render() {
-    const { images, showModal, imgUrl, tag, loading, totalPage, error, page } =
-      this.state;
-    const showLoadMore = totalPage / 12 > page;
-    const info = totalPage === 0;
+      {showModal && (
+        <Modal onClose={onCloseModal}>
+          <img src={selectedImage} alt="img" />
+        </Modal>
+      )}
 
-    return (
-      <>
-        <Searchbar onSubmit={this.handleSubmit} />
-        <ImageGallery images={images} openModal={this.onOpenModal} />
+      {loading && <Loader />}
 
-        {showModal && (
-          <Modal onClose={this.onCloseModal}>
-            <img src={imgUrl} alt={tag} />
-          </Modal>
-        )}
+      {showLoadMore && <Button loadMore={onLoadMore} />}
 
-        {loading && <Loader />}
+      {info && <Infobox />}
+      {error && <Infobox>{error}</Infobox>}
+    </>
+  );
+};
 
-        {showLoadMore && <Button loadMore={this.onLoadMore} />}
-
-        {info && <Infobox />}
-        {error && <Infobox>{error}</Infobox>}
-      </>
-    );
-  }
-}
+export default App;
